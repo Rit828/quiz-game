@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>มินิเกมตอบคำถาม ร.๒๙ พัน.๑</title>
+<style>
+    :root {
+        --army-green: #2f3e22;
+        --gold: #d4c26a;
+        --gold-glow: rgba(212, 194, 106, 0.4);
+        --dark-overlay: rgba(0, 0, 0, 0.65);
+    }
+
+    body {
+        margin: 0;
+        font-family: 'Tahoma', sans-serif;
+        color: #fff;
+        background: linear-gradient(var(--dark-overlay), var(--dark-overlay)),
+                    url('https://www.transparenttextures.com/patterns/camouflage.png'),
+                    linear-gradient(45deg, #2d3b23, #4c603a);
+        text-align: center;
+        min-height: 100vh;
+        overflow-x: hidden; 
+        transition: background 0.5s ease;
+    }
+
+    body.panic-mode {
+        background: radial-gradient(circle, rgba(139,0,0,0.4) 0%, rgba(0,0,0,0.9) 100%),
+                    url('https://www.transparenttextures.com/patterns/camouflage.png'),
+                    linear-gradient(45deg, #500, #200);
+        animation: redFlash 1s infinite alternate;
+    }
+
+    #role-selection-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: radial-gradient(circle, rgba(35,45,25,0.98) 0%, rgba(10,15,5,1) 100%);
+        z-index: 10000; flex-direction: column; align-items: center; justify-content: center; display: flex;
+        backdrop-filter: blur(10px);
+    }
+    .role-container {
+        background: rgba(0,0,0,0.7); border: 2px solid var(--gold); padding: 30px 20px; border-radius: 20px;
+        width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .role-btn {
+        background: linear-gradient(to bottom, rgba(50,70,35,0.8), rgba(30,45,20,0.9));
+        border: 1px solid var(--gold); color: #fff; padding: 14px; margin: 10px 0; width: 100%;
+        border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s;
+        display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;
+    }
+    .role-btn:hover { background: var(--gold); color: #000; transform: scale(1.02); }
+    .role-btn span { font-size: 0.8rem; opacity: 0.8; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 10px; color: #fff; }
+    .role-btn:hover span { background: #000; }
+
+    .container {
+        display: none; width: 90%; max-width: 800px; margin: auto; padding: 20px 0;
+    }
+
+    .main-crest {
+        width: 110px; max-width: 100%; height: auto;
+        filter: drop-shadow(0 0 15px rgba(212,194,106,0.3)); margin-bottom: 10px;
+        animation: float 4s ease-in-out infinite;
+    }
+
+    h1 { 
+        font-size: 1.8rem; margin: 10px 0; text-shadow: 0 4px 8px rgba(0,0,0,0.8); 
+        color: var(--gold); letter-spacing: 1px;
+    }
+    
+    .unit-tag { 
+        font-size: 1.1rem; font-weight: bold; letter-spacing: 1px; margin-bottom: 15px; opacity: 0.9;
+    }
+
+    #player-role-tag {
+        color: #ffeb3b; background: rgba(0,0,0,0.4); padding: 3px 12px; border-radius: 10px;
+        border: 1px solid rgba(212,194,106,0.3); font-size: 0.9rem; display: inline-block; margin-top: 5px;
+    }
+
+    #score-board {
+        font-size: 1.1rem; font-weight: bold; background: rgba(0,0,0,0.6); border: 2px solid var(--gold); 
+        display: inline-block; padding: 8px 20px; border-radius: 20px; margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 10px var(--gold-glow);
+    }
+
+    .lifeline-container { margin-bottom: 15px; }
+    .lifeline-btn {
+        background: linear-gradient(#b89e43, #86702b); border: 1px solid #fff; color: #000;
+        padding: 6px 14px; font-size: 0.85rem; font-weight: bold; border-radius: 15px; cursor: pointer; margin: 0 5px;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.4); transition: 0.2s;
+    }
+    .lifeline-btn:hover:not(:disabled) { transform: scale(1.05); background: #fff; }
+    .lifeline-btn:disabled { background: #444; color: #888; border-color: #555; cursor: not-allowed; box-shadow: none; }
+
+    .wheel-container { position: relative; width: 100%; max-width: 240px; aspect-ratio: 1 / 1; margin: 10px auto 20px; }
+
+    #wheel {
+        position: relative;
+        width: 100%; height: 100%; border-radius: 50%; border: 6px solid var(--gold);
+        background: radial-gradient(circle, #4b5d3a, #151d0f); 
+        transition: transform 5s cubic-bezier(0.1, 0.4, 0.1, 1); 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.8); 
+        overflow: hidden; box-sizing: border-box;
+    }
+
+    .wheel-logo { 
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 75%; height: auto; 
+        max-height: 75%;
+        object-fit: contain; 
+    }
+
+    .pointer { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 35px; height: 35px; background: var(--gold); clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; }
+
+    #question-box {
+        background: linear-gradient(135deg, rgba(25, 35, 15, 0.95), rgba(15, 20, 10, 0.98)); 
+        border: 2px solid var(--gold); border-radius: 15px; padding: 25px 20px; margin: 15px auto; 
+        box-shadow: 0 15px 35px rgba(0,0,0,0.6); min-height: 100px; width: 95%; box-sizing: border-box; 
+        display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
+    }
+
+    body.panic-mode #question-box { animation: shake 0.5s infinite; border-color: #f44336; }
+
+    #question-text { font-size: 1.2rem; line-height: 1.5; font-weight: bold; margin-bottom: 20px; }
+    #interaction-area { width: 100%; }
+
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+    
+    .option-btn, .submit-btn {
+        background: linear-gradient(to bottom, rgba(40,55,30,0.7), rgba(20,30,15,0.8)); 
+        border: 1px solid var(--gold); color: #fff; padding: 14px; border-radius: 10px; cursor: pointer; 
+        font-size: 1rem; font-weight: bold; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    .option-btn:hover:not(:disabled), .submit-btn:hover { background: var(--gold); color: #000; transform: translateY(-2px); }
+    .option-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+    #feedback { font-size: 1.2rem; font-weight: bold; margin-top: 15px; min-height: 25px; }
+
+    #timer { 
+        font-size: 1.1rem; color: #ffeb3b; background: rgba(0,0,0,0.6); padding: 8px 25px; 
+        border-radius: 50px; display: inline-block; border: 1px solid var(--gold); 
+    }
+    
+    .side-logo { position: fixed; bottom: 15px; right: 15px; width: 60px; opacity: 0.4; z-index: 5; }
+    #panic-number {
+        display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+        font-size: 6rem; font-weight: bold; color: rgba(255, 255, 255, 0.9); text-shadow: 0 0 30px #ff0000; 
+        z-index: 100; pointer-events: none; animation: bigNumberPulse 0.5s infinite alternate;
+    }
+
+    #correct-effect-screen, #incorrect-effect-screen, #timeout-effect-screen {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        z-index: 9998; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    #correct-effect-screen { background: rgba(20, 40, 15, 0.85); }
+    #incorrect-effect-screen { background: rgba(60, 10, 10, 0.85); }
+    #timeout-effect-screen { background: rgba(85, 45, 10, 0.85); }
+
+    .effect-title { font-size: 4rem; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin: 0; }
+    #correct-effect-screen h1 { color: #4caf50; text-shadow: 0 0 40px #4caf50; }
+    #incorrect-effect-screen h1 { color: #f44336; text-shadow: 0 0 40px #f44336; }
+    #timeout-effect-screen h1 { color: #ff9800; text-shadow: 0 0 40px #ff9800; }
+    .effect-sub { font-size: 1.5rem; color: #fff; margin-top: 15px; }
+
+    #mission-complete-screen {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: radial-gradient(circle, rgba(25,35,15,0.98) 0%, rgba(5,10,5,1) 100%); z-index: 9999; 
+        flex-direction: column; align-items: center; justify-content: center; text-align: center; backdrop-filter: blur(10px);
+    }
+    .mission-logos { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 15px; }
+    .mission-logos img { width: 80px; height: auto; filter: drop-shadow(0 0 20px rgba(212, 194, 106, 0.6)); animation: float 3s ease-in-out infinite alternate; }
+
+    #mission-complete-screen h1 { font-size: 2.8rem; color: var(--gold); text-shadow: 0 0 20px var(--gold); margin: 10px 0; animation: pulse 1.5s infinite; }
+    .stat-text { font-size: 1.2rem; color: #eee; margin: 5px 0; }
+    
+    #exam-mode-badge {
+        font-size: 1.1rem; color: #000; background: var(--gold); padding: 6px 20px; border-radius: 20px; font-weight: bold; margin-bottom: 10px; box-shadow: 0 0 15px var(--gold-glow); display: inline-block;
+    }
+    #badge-rank { font-size: 2rem; color: #ffeb3b; font-weight: bold; background: rgba(255,255,255,0.1); padding: 10px 30px; border-radius: 10px; border: 2px dashed var(--gold); margin: 15px 0; display: inline-block; text-shadow: 0 0 10px #ffeb3b; }
+
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes shake { 0%, 100% { transform: translate(0, 0); } 20% { transform: translate(-3px, 1px); } 40% { transform: translate(2px, -1px); } 60% { transform: translate(-1px, 2px); } 80% { transform: translate(3px, 1px); } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes redFlash { 0% { background-color: rgba(139, 0, 0, 0.1); } 100% { background-color: rgba(139, 0, 0, 0.35); } }
+    @keyframes bigNumberPulse { 0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.4; } 100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } }
+
+    @media (min-width: 768px) {
+        h1 { font-size: 2.4rem; } .main-crest { width: 130px; } #question-text { font-size: 1.5rem; } .wheel-container { max-width: 280px; }
+        .mission-logos img { width: 110px; } #mission-complete-screen h1 { font-size: 4.5rem; } #badge-rank { font-size: 2.5rem; }
+    }
+</style>
+</head>
+<body>
+
+<div id="role-selection-screen">
+    <div class="role-container">
+        <img src="image/ตรากองพันไม่มีพื้นหลัง.png" style="width:100px; margin-bottom:10px; filter: drop-shadow(0 0 10px var(--gold));" alt="Crest">
+        <h2 style="color:var(--gold); margin-top:0;">กรุณาเลือกสถานะผู้รับการทดสอบ</h2>
+        <p style="font-size:0.9rem; color:#bbb; margin-bottom:25px;">ระบบจะคัดชุดคำถามและความยากตามตำแหน่งของคุณ</p>
+        
+        <button class="role-btn" onclick="selectRole('relative')">👪 ญาติทหารใหม่ <span>ระดับ: ง่ายมาก</span></button>
+        <button class="role-btn" onclick="selectRole('recruit')">🪖 ทหารใหม่ <span>ระดับ: ง่าย</span></button>
+        <button class="role-btn" onclick="selectRole('assistant')">🎖️ ครูทหารใหม่ <span>ระดับ: ปานกลาง</span></button>
+        <button class="role-btn" onclick="selectRole('instructor')">👑 ครูนายสิบ <span>ระดับ: ยากมาก</span></button>
+    </div>
+</div>
+
+<div id="correct-effect-screen">
+    <h1 class="effect-title">🎉 ถูกต้อง! 🎉</h1>
+    <p class="effect-sub" id="correct-sub-text"></p>
+</div>
+
+<div id="incorrect-effect-screen">
+    <h1 class="effect-title">❌ ผิดครับ! ❌</h1>
+    <p class="effect-sub" id="incorrect-sub-text"></p>
+</div>
+
+<div id="timeout-effect-screen">
+    <h1 class="effect-title">⏰ หมดเวลา! ⏰</h1>
+    <p class="effect-sub">คุณใช้เวลาคิดนานเกินไป ระบบกำลังเปลี่ยนคำถาม...</p>
+</div>
+
+<div id="mission-complete-screen">
+    <div class="mission-logos">
+        <img src="image/ตรากองพันไม่มีพื้นหลัง.png" alt="Crest">
+        <img src="image/99322.png" alt="Unit Logo">
+        <img src="image/test.png" alt="Infantry Logo">
+    </div>
+    <h1>MISSION COMPLETE</h1>
+    
+    <div id="exam-mode-badge">แบบทดสอบระดับ: </div>
+    
+    <p class="stat-text" style="font-size: 1.5rem; font-weight: bold;">🎉 ยินดีด้วย! คุณปฏิบัติภารกิจสำเร็จ 🎉</p>
+    <div id="badge-rank">พลทหารปืนโหด</div>
+    <p class="stat-text" id="stat-streak">ตอบถูกต่อเนื่องสูงสุด: 0 ข้อ</p>
+    <p class="stat-text" id="stat-wrong">ตอบผิดไปทั้งสิ้น: 0 ครั้ง</p>
+</div>
+
+<div class="container" id="game-container">
+    <img src="image/ตรากองพันไม่มีพื้นหลัง.png" class="main-crest" alt="Crest">
+    <h1>มินิเกมตอบคำถาม</h1>
+    <div class="unit-tag">ร.๒๙ พัน.๑ (INFANTRY 291) <br><span id="player-role-tag">ตำแหน่ง: ยังไม่เลือก</span></div>
+
+    <div id="score-board">ภารกิจสำเร็จ: <span id="score">0</span> / 3 ข้อ</div><br>
+
+    <div class="lifeline-container">
+        <button id="lifeline-5050" class="lifeline-btn" onclick="use5050()">⚡ ตัวช่วย 50:50</button>
+        <button id="lifeline-skip" class="lifeline-btn" onclick="useSkip()">🔄 ขอคำสั่งใหม่</button>
+    </div>
+
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <div id="wheel" data-rotation="0">
+            <img src="image/99322.png" class="wheel-logo" alt="Unit Logo">
+        </div>
+    </div>
+
+    <div id="question-box">
+        <div id="panic-number">10</div>
+        <div id="question-text">กำลังเตรียมคำถาม...</div>
+        <div id="interaction-area"></div>
+        <div id="feedback"></div>
+    </div>
+
+    <div id="timer">รอกดเริ่มเกม...</div>
+</div>
+
+<img src="image/test.png" class="side-logo" alt="Infantry Logo">
+
+<script>
+const questionPools = {
+    relative: [
+        { type: 'choice', text: "สีน้ำเงินในธงชาติไทยหมายถึงอะไร?", options: ["ชาติ", "ศาสนา", "พระมหากษัตริย์", "ความสงบสุข"], answer: "พระมหากษัตริย์" },
+        { type: 'choice', text: "ธงชาติไทยมีทั้งหมดกี่สีหลัก?", options: ["2 สี", "3 สี", "4 สี", "5 สี"], answer: "3 สี" },
+        { type: 'choice', text: "เครื่องแบบทหารโดยทั่วไปสีอะไร?", options: ["ฟ้า", "แดง", "เขียว", "ขาว"], answer: "เขียว" },
+        { type: 'choice', text: "ประเทศไทยมีกี่ภาคตามการแบ่งภูมิศาสตร์?", options: ["4 ภาค", "5 ภาค", "6 ภาค", "7 ภาค"], answer: "6 ภาค" },
+        { type: 'choice', text: "คำขวัญของทหารคืออะไร?", options: ["ชาติ ศาสนา พระมหากษัตริย์", "รักสนุก", "เรียนเก่ง", "สามัคคีอย่างเดียว"], answer: "ชาติ ศาสนา พระมหากษัตริย์" },
+        // เพิ่มเติมอีก 5 ข้อ (ระดับ: ง่ายมาก)
+        { type: 'choice', text: "วันหยุดราชการประจำสัปดาห์โดยทั่วไปคือวันใด?", options: ["วันจันทร์-อังคาร", "วันพุธ-พฤหัสบดี", "วันเสาร์-อาทิตย์", "ไม่มีวันหยุด"], answer: "วันเสาร์-อาทิตย์" },
+        { type: 'choice', text: "เมื่อต้องการส่งพัสดุให้ทหารใหม่ สิ่งใดสำคัญที่สุดที่ต้องระบุ?", options: ["เบอร์รองเท้า", "ชื่อ-นามสกุล และหน่วยสังกัดที่ชัดเจน", "ส่วนสูง", "อาหารที่ชอบ"], answer: "ชื่อ-นามสกุล และหน่วยสังกัดที่ชัดเจน" },
+        { type: 'choice', text: "อาหารหลักที่เลี้ยงในโรงประกอบเลี้ยงของค่ายทหารคืออะไร?", options: ["ข้าวปั้น", "ข้าวสวยและกับข้าว", "พิซซ่า", "สปาเก็ตตี้"], answer: "ข้าวสวยและกับข้าว" },
+        { type: 'choice', text: "การเข้าเยี่ยมทหารใหม่ของญาติ มักจะทำได้ในช่วงวันใด?", options: ["วันจันทร์", "วันพุธ", "วันอาทิตย์ (ตามที่หน่วยกำหนด)", "กลางดึก"], answer: "วันอาทิตย์ (ตามที่หน่วยกำหนด)" },
+        { type: 'choice', text: "เพลงใดที่ใช้เปิดเพื่อเคารพธงชาติในเวลา 08:00 น. และ 18:00 น. ของทุกวัน?", options: ["เพลงแดนซ์", "เพลงชาติไทย", "เพลงหมอลำ", "เพลงสากล"], answer: "เพลงชาติไทย" }
+    ],
+    recruit: [
+        { type: 'choice', text: "ทหารใหม่ตื่นนอนกี่โมง?", options: ["04:00", "05:00", "06:00", "07:00"], answer: "05:00" },
+        { type: 'choice', text: "เวลาเคารพธงชาติช่วงเช้าคือกี่โมง?", options: ["04:00", "07:00", "08:00", "10:00"], answer: "08:00" },
+        { type: 'choice', text: "ยศต่ำสุดของทหารคืออะไร?", options: ["สิบตรี", "สิบโท", "จ่าสิบเอก", "พลทหาร"], answer: "พลทหาร" },
+        { type: 'choice', text: "การเคารพธงชาติยืนตรงกี่นาทีโดยประมาณ?", options: ["1 นาที", "2 นาที", "5 นาที", "10 นาที"], answer: "2 นาที" },
+        { type: 'choice', text: "อะไรหนักที่สุดตอนเป็นทหารใหม่ (อยู่บนใบหน้า)?", options: ["จมูก", "หู", "เปลือกตา", "คาง"], answer: "เปลือกตา" },
+        // เพิ่มเติมอีก 5 ข้อ (ระดับ: ง่าย)
+        { type: 'choice', text: "การจัดที่นอนของทหารใหม่ สิ่งใดต้องดึงให้ตึงและเรียบเป๊ะที่สุด?", options: ["ผ้าม่าน", "ผ้าปูที่นอนและผ้าห่ม", "มุ้ง", "ถุงเท้า"], answer: "ผ้าปูที่นอนและผ้าห่ม" },
+        { type: 'choice', text: "ทรงผมของทหารใหม่ตามระเบียบกองทัพบกในปัจจุบันเรียกว่าทรงอะไร?", options: ["รองทรงสูง", "ขาวสามด้าน (ข้างขาว ด้านบนสั้นตามระเบียบ)", "ทรงโมฮอค", "ทรงตามใจชอบ"], answer: "ขาวสามด้าน (ข้างขาว ด้านบนสั้นตามระเบียบ)" },
+        { type: 'choice', text: "อุปกรณ์ใดที่ใช้สำหรับรับประทานอาหารร่วมกันในโรงเลี้ยง?", options: ["มือเปล่า", "ถาดหลุมพร้อมช้อนส้อม", "ตะเกียบไม้", "จานกระดาษ"], answer: "ถาดหลุมพร้อมช้อนส้อม" },
+        { type: 'choice', text: "เมื่อได้ยินคำสั่งยุทธวิธี 'แถว - ตรง' ทหารใหม่ต้องปฏิบัติอย่างไร?", options: ["นั่งลงทันที", "ยืนนิ่ง อกผาย ไหล่ผึ่ง สายตามองตรงไปข้างหน้า", "หันไปคุยกับเพื่อนข้างๆ", "เดินแยกย้ายกันออกไป"], answer: "ยืนนิ่ง อกผาย ไหล่ผึ่ง สายตามองตรงไปข้างหน้า" },
+        { type: 'choice', text: "เวลาวิ่งออกกำลังกายตอนเช้า ทหารใหม่มักทำสิ่งใดพร้อมกันเพื่อความพร้อมเพรียง?", options: ["ร้องเพลงเปล่งเสียงซ้าย-ขวา หรือนับก้าวเท้า", "เล่นโทรศัพท์มือถือ", "ผิวปาก", "หลับตาเดิน"], answer: "ร้องเพลงเปล่งเสียงซ้าย-ขวา หรือนับก้าวเท้า" }
+    ],
+    assistant: [
+        { type: 'choice', text: "คำสั่งพื้นฐานที่ทหารต้องรู้คืออะไร?", options: ["ขวาหัน", "กินข้าว", "นอนพัก", "เล่นโทรศัพท์"], answer: "ขวาหัน" },
+        { type: 'choice', text: "ก่อนออกจากแถวต้องทำอะไร?", options: ["วิ่งออกไป", "ขออนุญาต", "นั่งลง", "ตะโกน"], answer: "ขออนุญาต" },
+        { type: 'choice', text: "เวลาทหารเดินผ่านผู้บังคับบัญชาต้องทำอะไร?", options: ["เดินต่อไป", "ทำความเคารพ", "หยุดนิ่ง", "หันหลังกลับ"], answer: "ทำความเคารพ" },
+        { type: 'choice', text: "เวลาพบผู้บังคับบัญชาต้องทำอะไรเป็นอย่างแรก?", options: ["ยืนเฉยๆ", "ทำความเคารพ", "เดินหนี", "นั่งลง"], answer: "ทำความเคารพ" },
+        { type: 'choice', text: "เวลาฝึกพื้นฐานทหารเน้นเรื่องอะไร?", options: ["ระเบียบวินัย", "เล่นกีฬา", "ทำอาหาร", "เล่นเกม"], answer: "ระเบียบวินัย" },
+        // เพิ่มเติมอีก 5 ข้อ (ระดับ: ปานกลาง)
+        { type: 'choice', text: "การสลายแถวทหารอย่างเป็นระเบียบตามรูปแบบการฝึกแถวชิด ต้องใช้คำสั่งว่าอะไร?", options: ["แยกย้ายได้", "เลิกแถว", "กลับบ้าน", "ไปได้"], answer: "เลิกแถว" },
+        { type: 'choice', text: "การทำความเคารพขณะสวมหมวกและมือเปล่าของทหารบกเรียกว่าท่าอะไร?", options: ["ท่าวันทยหัตถ์", "ท่ากราบ", "ท่าจับมือ", "ท่าจับหมวก"], answer: "ท่าวันทยหัตถ์" },
+        { type: 'choice', text: "ในการฝึกยิงปืนด้วยกระสุนจริง สิ่งที่ผู้ช่วยครูฝึกต้องเน้นย้ำและคำนึงถึงมากที่สุดคืออะไร?", options: ["ความเร็วในการยิง", "กฎความปลอดภัยในการใช้อาวุธ", "ความสวยงามของท่าทาง", "เสียงของปืน"], answer: "กฎความปลอดภัยในการใช้อาวุธ" },
+        { type: 'choice', text: "การแต่งกายชุดฝึก ทหารต้องคาดสิ่งใดรอบเอวเพื่อใช้ยึดกระเป๋ากระสุนและกระติกน้ำสนาม?", options: ["เข็มขัดสนาม", "เชือกฟาง", "สายรัดเอวแฟชั่น", "ผ้าขาวม้า"], answer: "เข็มขัดสนาม" },
+        { type: 'choice', text: "เมื่อผู้บังคับบัญชาสั่งคำสั่ง 'ตามระเบียบ, พัก' เท้าข้างใดของทหารจะต้องแยกออกไปทางซ้าย?", options: ["เท้าขวา", "เท้าซ้าย", "แยกพร้อมกันทั้งสองเท้า", "ไม่ต้องแยกเท้า"], answer: "เท้าซ้าย" }
+    ],
+    instructor: [
+        { type: 'choice', text: "อาวุธประจำกายที่ฝึกใช้คืออะไร?", options: ["AK47", "Tavor TAR-21", "M16", "Galil ACE"], answer: "Galil ACE" },
+        { type: 'choice', text: "กองทัพไทยมีกี่เหล่าทัพหลัก?", options: ["2 เหล่าทัพ", "3 เหล่าทัพ", "4 เหล่าทัพ", "5 เหล่าทัพ"], answer: "3 เหล่าทัพ" },
+        { type: 'choice', text: "วันกองทัพไทยตรงกับวันที่เท่าไร?", options: ["18 ม.ค.", "23 ต.ค.", "5 ธ.ค.", "12 ส.ค."], answer: "18 ม.ค." },
+        { type: 'choice', text: "เสียงปลุกตอนเช้าของทหารเรียกว่าอะไร?", options: ["รีเวย์", "เรเวลล์", "นกหวีด", "ไซเรน"], answer: "นกหวีด" },
+        { type: 'choice', text: "ในกองทัพไทย หน่วยใดเป็นกองทัพบก?", options: ["ทัพอากาศ", "ทัพเรือ", "ทัพบก", "ทุกข้อ"], answer: "ทัพบก" },
+        // เพิ่มเติมอีก 5 ข้อ (ระดับ: ยากมาก)
+        { type: 'choice', text: "หน่วย ร.๒๙ พัน.๑ มีนามหน่วยเต็มอย่างเป็นทางการว่าอย่างไร?", options: ["กองพันทหารราบที่ ๑ กรมทหารราบที่ ๒๙", "กองพันทหารม้าที่ ๑ กรมทหารราบที่ ๒๙", "กองพันทหารปืนใหญ่ที่ ๑ กรมทหารทหารราบที่ ๒๙", "กองพันทหารราบที่ ๒๙ กรมที่ ๑"], answer: "กองพันทหารราบที่ ๑ กรมทหารราบที่ ๒๙" },
+        { type: 'choice', text: "ตามโครงสร้างทางยุทธวิธี เหล่าทหารราบ (Infantry) จัดเป็นเหล่าที่มีคุณลักษณะเด่นในเรื่องใด?", options: ["การรบในอากาศ", "การเข้าประชิดข้าศึกเพื่อทำลายและยึดครองพื้นที่", "การสนับสนุนเสบียงกรัง", "การต่อเรือรบหลวง"], answer: "การเข้าประชิดข้าศึกเพื่อทำลายและยึดครองพื้นที่" },
+        { type: 'choice', text: "ก่อนดำเนินการถอดและประกอบอาวุธประจำกาย ขั้นตอนแรกสุดที่ต้องปฏิบัติเพื่อความปลอดภัย (Clearing Weapon) คืออะไร?", options: ["ถอดชุดลูกเลื่อน", "ตรวจอาวุธให้แน่ใจว่าไม่มีกระสุนค้างในรังเพลิง", "เช็ดชโลมน้ำมันล้างปืน", "ถอดพานท้ายปืน"], answer: "ตรวจอาวุธให้แน่ใจว่าไม่มีกระสุนค้างในรังเพลิง" },
+        { type: 'choice', text: "สัญลักษณ์รูป 'ปืนเล็กยาวไขว้ประกอบกับตลับกระสุน' บนเครื่องหมายเหล่า หมายถึงเหล่าใด?", options: ["เหล่าทหารช่าง", "เหล่าทหารราบ", "เหล่าทหารปืนใหญ่", "เหล่าทหารม้า"], answer: "เหล่าทหารราบ" },
+        { type: 'choice', text: "คติพจน์หรือหัวใจสำคัญของหน่วยทหารราบในการปฏิบัติการเข้าโจมตีที่หมายตามหลักนิยมคืออะไร?", options: ["การล่าถอยอย่างรวดเร็ว", "การยิงและการเคลื่อนที่ (Fire and Movement)", "การตั้งรับในที่ตั้งมั่นถาวร", "การเจรจาสันติภาพ"], answer: "การยิงและการเคลื่อนที่ (Fire and Movement)" }
+    ]
+};
+
+let remaining = [];
+let countdownInterval;
+let timeRemaining = 60;
+let currentQuestionObj = null;
+let correctCount = 0;
+const targetScore = 3;
+
+let currentStreak = 0;
+let maxStreak = 0;
+let totalWrong = 0;
+let audioCtx = null;
+let selectedRoleKey = ""; 
+
+function selectRole(roleKey) {
+    const roleNames = { relative: "ญาติทหารใหม่", recruit: "ทหารใหม่", assistant: "ครูทหารใหม่", instructor: "ครูนายสิบ" };
+    selectedRoleKey = roleKey;
+    
+    remaining = [...questionPools[roleKey]];
+    
+    document.getElementById("player-role-tag").innerText = "ตำแหน่ง: " + roleNames[roleKey];
+    document.getElementById("exam-mode-badge").innerText = "แบบทดสอบระเบียบวินัย: " + roleNames[roleKey];
+    
+    document.getElementById("role-selection-screen").style.display = "none";
+    document.getElementById("game-container").style.display = "block";
+    
+    setTimeout(() => {
+        spin();
+    }, 100);
+}
+
+function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+function playSound(type) {
+    try {
+        initAudio(); if (!audioCtx) return;
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        if (type === 'spin') {
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(400, now + 4.9);
+            gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0, now + 5); osc.start(now); osc.stop(now + 5);
+        } else if (type === 'correct') {
+            osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, now); osc.frequency.setValueAtTime(659.25, now + 0.15); osc.frequency.setValueAtTime(783.99, now + 0.3);
+            gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.6); osc.start(now); osc.stop(now + 0.6);
+        } else if (type === 'incorrect' || type === 'timeout') {
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(180, now); osc.frequency.linearRampToValueAtTime(90, now + 0.5);
+            gain.gain.setValueAtTime(0.15, now); gain.gain.linearRampToValueAtTime(0, now + 0.5); osc.start(now); osc.stop(now + 0.5);
+        } else if (type === 'panic') {
+            osc.type = 'sine'; osc.frequency.setValueAtTime(800, now); gain.gain.setValueAtTime(0.08, now); gain.gain.linearRampToValueAtTime(0, now + 0.15); osc.start(now); osc.stop(now + 0.15);
+        } else if (type === 'win') {
+            [440, 554, 659, 880].forEach((f, i) => {
+                const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination);
+                o.frequency.setValueAtTime(f, now + i*0.15); g.gain.setValueAtTime(0.1, now + i*0.15); g.gain.linearRampToValueAtTime(0, now + i*0.15 + 0.4);
+                o.start(now + i*0.15); o.stop(now + i*0.15 + 0.4);
+            });
+        }
+    } catch(e) {}
+}
+
+function resetPanicMode() {
+    document.body.classList.remove("panic-mode");
+    document.getElementById("panic-number").style.display = "none";
+}
+
+function startCountdown() {
+    clearInterval(countdownInterval);
+    timeRemaining = 60;
+    resetPanicMode();
+    updateTimerUI();
+
+    countdownInterval = setInterval(() => {
+        timeRemaining--;
+        if (timeRemaining <= 10 && timeRemaining > 0) {
+            document.body.classList.add("panic-mode");
+            const panicNum = document.getElementById("panic-number");
+            panicNum.innerText = timeRemaining;
+            panicNum.style.display = "block";
+            playSound('panic');
+        } else {
+            resetPanicMode();
+        }
+
+        if (timeRemaining > 0) {
+            updateTimerUI();
+        } else {
+            clearInterval(countdownInterval);
+            totalWrong++;
+            currentStreak = 0;
+            showTimeoutEffect(() => { spin(); });
+        }
+    }, 1000);
+}
+
+function updateTimerUI() { document.getElementById("timer").innerText = "เหลือเวลาทำภารกิจ " + timeRemaining + " วินาที"; }
+function updateScore() { document.getElementById("score").innerText = correctCount; }
+
+function calcRank() {
+    if (totalWrong === 0) return "👑 ยอดผู้กองไร้พ่าย";
+    if (totalWrong <= 2) return "🎖️ จ่าสิบเอกจอมแม่น";
+    if (maxStreak >= 2) return "🔫 พลทหารปืนโหด";
+    return "🔰 พลทหารฝึกหัด";
+}
+
+function triggerMissionComplete() { 
+    clearInterval(countdownInterval); 
+    resetPanicMode();
+    playSound('win');
+    document.getElementById("badge-rank").innerText = calcRank();
+    document.getElementById("stat-streak").innerText = `ตอบถูกต่อเนื่องสูงสุด: ${maxStreak} ข้อ`;
+    document.getElementById("stat-wrong").innerText = `ตอบผิดไปทั้งสิ้น: ${totalWrong} ครั้ง`;
+    document.getElementById("mission-complete-screen").style.display = "flex"; 
+}
+
+function showCorrectEffect(callback) {
+    resetPanicMode(); 
+    playSound('correct');
+    document.getElementById("correct-sub-text").innerText = `ตอบถูกติดกัน ${currentStreak} ข้อแล้ว!`;
+    const effectScreen = document.getElementById("correct-effect-screen");
+    effectScreen.style.display = "flex";
+    setTimeout(() => { effectScreen.style.display = "none"; if(callback) callback(); }, 1500); 
+}
+
+function showIncorrectEffect(callback) {
+    resetPanicMode(); 
+    playSound('incorrect');
+    document.getElementById("incorrect-sub-text").innerText = `คำตอบที่ถูกต้องคือ: ${currentQuestionObj.answer}`;
+    const effectScreen = document.getElementById("incorrect-effect-screen");
+    effectScreen.style.display = "flex";
+    setTimeout(() => { effectScreen.style.display = "none"; if(callback) callback(); }, 2000); 
+}
+
+function showTimeoutEffect(callback) {
+    resetPanicMode();
+    playSound('timeout');
+    const effectScreen = document.getElementById("timeout-effect-screen");
+    effectScreen.style.display = "flex";
+    setTimeout(() => { effectScreen.style.display = "none"; if(callback) callback(); }, 2000);
+}
+
+function checkAnswer(userAnswer) {
+    clearInterval(countdownInterval); 
+    resetPanicMode();
+    document.getElementById("interaction-area").innerHTML = ""; 
+    
+    if (userAnswer.trim().toLowerCase() === currentQuestionObj.answer.trim().toLowerCase()) {
+        currentStreak++;
+        if (currentStreak > maxStreak) maxStreak = currentStreak;
+        correctCount++;
+        updateScore();
+        showCorrectEffect(() => {
+            if (correctCount >= targetScore) triggerMissionComplete();
+            else spin(); 
+        });
+    } else {
+        totalWrong++;
+        currentStreak = 0;
+        showIncorrectEffect(() => { spin(); });
+    }
+}
+
+function use5050() {
+    if (!currentQuestionObj || currentQuestionObj.type !== 'choice') return;
+    document.getElementById("lifeline-5050").disabled = true;
+    const btns = document.querySelectorAll(".option-btn");
+    let removed = 0;
+    
+    const btnArray = Array.from(btns).sort(() => Math.random() - 0.5);
+    for (let btn of btnArray) {
+        if (btn.innerText !== currentQuestionObj.answer) {
+            btn.disabled = true;
+            removed++;
+            if (removed >= 2) break;
+        }
+    }
+}
+
+function useSkip() {
+    document.getElementById("lifeline-skip").disabled = true;
+    clearInterval(countdownInterval);
+    resetPanicMode();
+    spin();
+}
+
+function renderInteraction(qObj) {
+    const interactionArea = document.getElementById("interaction-area");
+    interactionArea.innerHTML = ""; 
+    
+    document.getElementById("lifeline-skip").disabled = false;
+
+    if (qObj.type === 'choice') {
+        document.getElementById("lifeline-5050").disabled = false;
+        
+        let grid = document.createElement("div");
+        grid.className = "options-grid";
+        qObj.options.forEach(opt => {
+            let btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt);
+            grid.appendChild(btn);
+        });
+        interactionArea.appendChild(grid);
+    } else {
+        document.getElementById("lifeline-5050").disabled = true;
+    }
+}
+
+function spin() {
+    initAudio();
+    
+    if (remaining.length === 0) {
+        remaining = [...questionPools[selectedRoleKey]];
+    }
+
+    document.getElementById("timer").innerText = "⌛ กำลังสุ่มภารกิจถัดไป...";
+    document.getElementById("question-text").innerText = "กำลังสุ่ม...";
+    document.getElementById("interaction-area").innerHTML = "";
+    document.getElementById("feedback").innerText = "";
+    document.getElementById("lifeline-5050").disabled = true;
+    resetPanicMode();
+    playSound('spin');
+
+    const wheel = document.getElementById("wheel");
+    let currentRotation = parseFloat(wheel.dataset.rotation);
+    let newRotation = currentRotation + 1800 + Math.random() * 1800;
+    
+    wheel.dataset.rotation = newRotation;
+    wheel.style.transform = `rotate(${newRotation}deg)`;
+
+    setTimeout(() => {
+        const i = Math.floor(Math.random() * remaining.length);
+        currentQuestionObj = remaining.splice(i, 1)[0];
+        document.getElementById("question-text").innerText = currentQuestionObj.text;
+        renderInteraction(currentQuestionObj);
+        startCountdown();
+    }, 5000);
+}
+
+window.onload = () => {
+    // โหลดเสร็จ รอเริ่มเกม
+};
+</script>
+
+</body>
+</html>
