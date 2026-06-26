@@ -53,14 +53,12 @@
     #mute-btn:hover { background: var(--gold); color: var(--black-solid); }
 
     /* Modal / Screen base styles */
-    #role-selection-screen, #leaderboard-screen, #name-input-screen {
+    #role-selection-screen {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: radial-gradient(circle, rgba(20,25,15,0.98) 0%, var(--black-solid) 100%);
         z-index: 10000; flex-direction: column; align-items: center; justify-content: center; display: flex;
         backdrop-filter: blur(10px);
     }
-    #leaderboard-screen { z-index: 10005; display: none; } 
-    #name-input-screen { z-index: 10008; display: none; background: rgba(5, 6, 4, 0.95); }
 
     .role-container {
         background: rgba(10, 12, 8, 0.8); border: 1px solid var(--gold); padding: 35px 25px; border-radius: 12px;
@@ -77,21 +75,6 @@
     .role-btn:hover span { background: rgba(0,0,0,0.8); color: #fff; }
     
     .btn-center { justify-content: center; }
-    .btn-gold { background: linear-gradient(to bottom, #4a3b12, #2a2008); border-color: #ffd700; color: #ffd700; }
-    .btn-gold:hover { background: #ffd700; color: var(--black-solid); box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
-
-    /* Input box สวยๆ สำหรับกรอกชื่อ */
-    .input-box {
-        background: rgba(15, 20, 12, 0.95); border: 2px solid var(--gold); padding: 40px 30px; border-radius: 12px;
-        width: 90%; max-width: 420px; box-shadow: 0 0 40px rgba(212, 194, 106, 0.25); text-align: center;
-    }
-    .name-input-field {
-        width: 100%; padding: 15px; margin: 25px 0; border: 1px solid var(--gold); border-radius: 8px;
-        background: rgba(0,0,0,0.7); color: #fff; font-size: 1.3rem; font-family: inherit; 
-        box-sizing: border-box; text-align: center; transition: all 0.3s;
-    }
-    .name-input-field:focus { outline: none; box-shadow: 0 0 15px var(--gold-glow); background: rgba(20,25,15,0.9); }
-    .name-input-field::placeholder { color: #666; font-size: 1.1rem; }
 
     .container { display: none; width: 90%; max-width: 800px; margin: auto; padding: 20px 0; position: relative; z-index: 10; }
 
@@ -228,18 +211,7 @@
     #exam-mode-badge { font-size: 1rem; color: var(--black-solid); background: var(--gold); padding: 6px 15px; border-radius: 6px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
     #badge-rank { font-size: 2rem; color: #fff; font-weight: bold; background: rgba(255,255,255,0.05); padding: 10px 25px; border-radius: 8px; border: 1px solid var(--gold); margin: 10px 0; display: inline-block; }
 
-    .leaderboard-box { background: rgba(0,0,0,0.5); border: 1px dashed var(--gold); padding: 15px; border-radius: 8px; margin-top: 10px; min-width: 280px; }
-    
-    .lb-item {
-        display: flex; justify-content: space-between; align-items: center;
-        background: rgba(0,0,0,0.6); border: 1px solid var(--gold);
-        padding: 12px 15px; margin-bottom: 10px; border-radius: 6px;
-        font-size: 1.1rem; color: #fff; font-weight: bold;
-    }
-    .lb-rank-1 { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); border-color: #ffd700; color: #ffd700;}
-    .lb-rank-2 { border-color: #c0c0c0; color: #c0c0c0;}
-    .lb-rank-3 { border-color: #cd7f32; color: #cd7f32;}
-    .lb-role-badge { font-size: 0.8rem; background: rgba(255,255,255,0.15); padding: 2px 8px; border-radius: 4px; margin-left: 8px; color: #fff;}
+    .stat-box { background: rgba(0,0,0,0.5); border: 1px dashed var(--gold); padding: 15px; border-radius: 8px; margin-top: 10px; min-width: 280px; }
 
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
     @keyframes shake { 0%, 100% { transform: translate(0, 0); } 20% { transform: translate(-2px, 1px); } 40% { transform: translate(2px, -1px); } 60% { transform: translate(-1px, 2px); } 80% { transform: translate(2px, 1px); } }
@@ -268,31 +240,6 @@
         <button class="role-btn" onclick="selectRole('recruit')">ทหารใหม่ <span>ระดับ: ง่าย</span></button>
         <button class="role-btn" onclick="selectRole('assistant')">ครูทหารใหม่ <span>ระดับ: ปานกลาง</span></button>
         <button class="role-btn" onclick="selectRole('instructor')">ครูนายสิบ <span>ระดับ: ยากมาก</span></button>
-        
-        <hr style="border-color: rgba(212,194,106,0.2); margin: 25px 0 15px 0;">
-        <button class="role-btn btn-center btn-gold" onclick="showLeaderboard()">🏆 ทำเนียบเกียรติยศ (TOP 3)</button>
-    </div>
-</div>
-
-<div id="leaderboard-screen">
-    <div class="role-container">
-        <h2 style="color:var(--gold); margin-top:0; font-size: 1.8rem; text-align: center;">🏆 ทำเนียบเกียรติยศ</h2>
-        <p style="font-size:0.95rem; color:#999; margin-bottom:20px; text-align: center;">สถิติทำเวลาเร็วที่สุด 3 อันดับแรก</p>
-        
-        <div id="leaderboard-list" style="margin: 20px 0; text-align: left; min-height: 150px;">
-            </div>
-        
-        <button class="role-btn btn-center" onclick="hideLeaderboard()">ย้อนกลับ</button>
-    </div>
-</div>
-
-<div id="name-input-screen">
-    <div class="input-box">
-        <h2 style="color:var(--gold); margin-top:0; font-size:1.8rem;">🎉 ยอดเยี่ยม!</h2>
-        <h3 style="color:#fff; margin-top:5px;">คุณทำเวลาติดอันดับ TOP 3</h3>
-        <p style="color:#bbb; font-size: 1rem; margin-top:15px;">กรุณาระบุนามเรียกขานของคุณเพื่อบันทึกสถิติ</p>
-        <input type="text" id="player-name-input" class="name-input-field" placeholder="พิมพ์ชื่อของคุณที่นี่..." maxlength="15" autocomplete="off">
-        <button class="role-btn btn-center btn-gold" onclick="saveNameAndComplete()">💾 ยืนยันและบันทึกข้อมูล</button>
     </div>
 </div>
 
@@ -322,13 +269,12 @@
     <div id="exam-mode-badge">แบบทดสอบระดับ: </div>
     
     <p class="stat-text" style="font-size: 1.2rem; color: #fff; margin-top: 5px;">การประเมินผลการปฏิบัติงานเสร็จสิ้น</p>
-    <div id="badge-rank">พลทหารปืนโหด</div>
+    <div id="badge-rank">พลทหารฝึกหัด</div>
     <p class="stat-text" id="stat-streak">ตอบถูกต่อเนื่องสูงสุด: 0 ข้อ</p>
     <p class="stat-text" id="stat-wrong">ตอบผิดไปทั้งสิ้น: 0 ครั้ง</p>
     
-    <div class="leaderboard-box">
-        <p class="stat-text" id="stat-time" style="font-weight: bold;">เวลาที่ใช้ปฏิบัติภารกิจ: 0 วินาที</p>
-        <p class="stat-text" id="stat-best-time" style="margin-top: 10px; font-size: 1.1rem;">กำลังประมวลผลสถิติ...</p>
+    <div class="stat-box">
+        <p class="stat-text" id="stat-time" style="font-weight: bold; margin: 0;">เวลาที่ใช้ปฏิบัติภารกิจ: 0 วินาที</p>
     </div>
 
     <button class="role-btn btn-center" style="max-width: 300px; margin: 25px auto 0 auto;" onclick="returnToMainMenu()">🔄 ย้อนกลับสู่เมนูหลัก</button>
@@ -338,7 +284,7 @@
     <img src="image/ตรากองพันไม่มีพื้นหลัง.png" class="main-crest" alt="Crest" onerror="this.style.display='none'">
     <h1>ระบบทดสอบความรู้ยุทธวิธี</h1>
     <div class="unit-tag">ร.๒๙ พัน.๑ (INFANTRY 291)</div>
-    <div id="player-role-tag">สถานะ: ยังไม่ระบุ</div><br><br>
+    <div id="player-role-tag">Node สถานะ: ยังไม่ระบุ</div><br><br>
 
     <div class="status-panel">
         <span id="score-text">ความสำเร็จของภารกิจ: <span id="score">0</span> / 5</span>
@@ -436,7 +382,7 @@ const questionPools = {
         { type: 'choice', text: "สัญลักษณ์รูป 'ปืนเล็กยาวไขว้ประกอบกับตลับกระสุน' บนเครื่องหมายเหล่า หมายถึงเหล่าใด?", options: ["เหล่าทหารช่าง", "เหล่าทหารราบ", "เหล่าทหารปืนใหญ่", "เหล่าทหารม้า"], answer: "เหล่าทหารราบ" },
         { type: 'choice', text: "คติพจน์หรือหัวใจสำคัญของหน่วยทหารราบในการปฏิบัติการเข้าโจมตีที่หมายตามหลักนิยมคืออะไร?", options: ["การล่าถอยอย่างรวดเร็ว", "การยิงและการเคลื่อนที่ (Fire and Movement)", "การตั้งรับในที่ตั้งมั่นถาวร", "การเจรจาสันติภาพ"], answer: "การยิงและการเคลื่อนที่ (Fire and Movement)" },
         { type: 'choice', text: "ตามอัตราการจัดยุทโธปกรณ์ (อจย.) ของทหารราบ 1 หมู่ปืนเล็ก (Rifle Squad) ประกอบด้วยกำลังพลกี่นาย?", options: ["7 นาย", "9 นาย", "11 นาย", "15 นาย"], answer: "11 นาย" },
-        { type: 'choice', text: "อาวุธประจำกายปืนเล็กยาว Tavor TAR-21 หรือ M16 ใช้กระสุนขนาดมาตรฐานใด?", options: ["7.62x51 มม.", "5.56x45 มม. นาโต้", "9x19 มม. พาราเบลลัม", ".45 ACP"], answer: "5.56x45 มม. นาโต้" },
+        { type: 'choice', text: "อาวุวุธประจำกายปืนเล็กยาว Tavor TAR-21 หรือ M16 ใช้กระสุนขนาดมาตรฐานใด?", options: ["7.62x51 มม.", "5.56x45 มม. นาโต้", "9x19 มม. พาราเบลลัม", ".45 ACP"], answer: "5.56x45 มม. นาโต้" },
         { type: 'choice', text: "ในการเคลื่อนที่เข้าตีผ่านสภาพแวดล้อมที่เป็นป่าทึบ รูปขบวนหมู่ปืนเล็กใดที่เหมาะสมที่สุดในการรักษาสมดุลระหว่างการควบคุมและความเร็ว?", options: ["รูปขบวนแถวตอน (Column)", "รูปขบวนหน้ากระดาน (Line)", "รูปขบวนลิ่ม (Wedge)", "รูปขบวนตัววี (Vee)"], answer: "รูปขบวนแถวตอน (Column)" },
         { type: 'choice', text: "ขั้นตอนสุดท้ายของการรุก (Offense) ในทางยุทธวิธีของหน่วยระดับกองพันทหารราบคืออะไร?", options: ["การเข้าตี (Attack)", "การกวาดล้าง (Clearing)", "การเสริมความมั่นคงและการจัดระเบียบใหม่ (Consolidation & Reorganization)", "การถอนตัว (Withdrawal)"], answer: "การเสริมความมั่นคงและการจัดระเบียบใหม่ (Consolidation & Reorganization)" },
         { type: 'choice', text: "กฎการปะทะ หรือ Rules of Engagement (ROE) มีความสำคัญสูงสุดในเรื่องใด?", options: ["กำหนดโควต้าการเบิกกระสุน", "เป็นกรอบแนวทางกำหนดเงื่อนไขว่าเมื่อใดควรใช้หรือหลีกเลี่ยงการใช้กำลังอาวุธ", "คู่มือการซ่อมบำรุงปืน", "แผนที่ระบุที่ตั้งเป้าหมาย"], answer: "เป็นกรอบแนวทางกำหนดเงื่อนไขว่าเมื่อใดควรใช้หรือหลีกเลี่ยงการใช้กำลังอาวุธ" }
@@ -457,111 +403,11 @@ let audioCtx = null;
 let selectedRoleKey = ""; 
 let isMuted = false;
 let missionStartTime = 0; 
-let pendingTimeTaken = 0;
 const roleNamesDisplay = { relative: "ญาติ", recruit: "ทหารใหม่", assistant: "ครูทหารใหม่", instructor: "ครูนายสิบ" };
 
 function toggleMute() {
     isMuted = !isMuted;
     document.getElementById("mute-btn").innerText = isMuted ? "🔇 ปิดเสียง" : "🔊 เปิดเสียง";
-}
-
-function showLeaderboard() {
-    const lbScreen = document.getElementById("leaderboard-screen");
-    const lbList = document.getElementById("leaderboard-list");
-    lbList.innerHTML = "";
-    
-    let records = JSON.parse(localStorage.getItem('r291_top_records')) || [];
-    
-    if(records.length === 0) {
-        lbList.innerHTML = "<p style='text-align:center; color:#888; font-size:1.1rem; margin-top:40px;'>ยังไม่มีข้อมูลสถิติภารกิจ</p>";
-    } else {
-        records.forEach((rec, idx) => {
-            let rankClass = idx === 0 ? "lb-rank-1" : (idx === 1 ? "lb-rank-2" : "lb-rank-3");
-            let medal = idx === 0 ? "🥇" : (idx === 1 ? "🥈" : "🥉");
-            
-            lbList.innerHTML += `<div class="lb-item ${rankClass}">
-                <div>${medal} อันดับ ${idx+1} <span style="color:#fff; margin-left:8px; font-size:1.2rem;">${rec.name || "นิรนาม"}</span> <span class="lb-role-badge">${rec.roleName}</span></div>
-                <div>${rec.time.toFixed(2)} วิ</div>
-            </div>`;
-        });
-    }
-    lbScreen.style.display = "flex";
-}
-
-function hideLeaderboard() { document.getElementById("leaderboard-screen").style.display = "none"; }
-
-function checkAndShowLeaderboardPrompt(timeTaken) {
-    let records = JSON.parse(localStorage.getItem('r291_top_records')) || [];
-    let isTop3 = false;
-    
-    if (records.length < 3) {
-        isTop3 = true; 
-    } else if (timeTaken < records[records.length - 1].time) {
-        isTop3 = true;
-    }
-
-    if (isTop3) {
-        pendingTimeTaken = timeTaken;
-        document.getElementById("name-input-screen").style.display = "flex";
-        document.getElementById("player-name-input").focus();
-    } else {
-        finalizeMissionComplete(timeTaken, null);
-    }
-}
-
-function saveNameAndComplete() {
-    let playerName = document.getElementById("player-name-input").value.trim();
-    if (!playerName) playerName = "นิรนาม";
-    
-    document.getElementById("name-input-screen").style.display = "none";
-    document.getElementById("player-name-input").value = ""; 
-    
-    finalizeMissionComplete(pendingTimeTaken, playerName);
-}
-
-function finalizeMissionComplete(timeTaken, newPlayerName) {
-    let records = JSON.parse(localStorage.getItem('r291_top_records')) || [];
-    let bestTimeEl = document.getElementById("stat-best-time");
-    
-    if (newPlayerName) {
-        records.push({ name: newPlayerName, time: timeTaken, roleName: roleNamesDisplay[selectedRoleKey] });
-        records.sort((a, b) => a.time - b.time); 
-        records = records.slice(0, 3); 
-        localStorage.setItem('r291_top_records', JSON.stringify(records));
-
-        if (records[0].time === timeTaken && records[0].name === newPlayerName) {
-            bestTimeEl.innerHTML = `🏆 สุดยอด! คุณคืออันดับ 1 คนใหม่`;
-            bestTimeEl.style.color = "#81c784";
-        } else {
-            bestTimeEl.innerHTML = `บันทึกชื่อของคุณลงใน Top 3 เรียบร้อย`;
-            bestTimeEl.style.color = "#81c784";
-        }
-    } else {
-        bestTimeEl.innerHTML = `เกือบไปแล้ว! ทำเวลาให้เร็วกว่านี้เพื่อขึ้นบอร์ดอันดับนะ`;
-        bestTimeEl.style.color = "#e57373";
-    }
-
-    document.getElementById("stat-time").innerHTML = `เวลาที่ใช้ปฏิบัติภารกิจ: <span style="color:var(--gold); font-size:1.3rem;">${timeTaken.toFixed(2)}</span> วินาที`;
-    document.getElementById("badge-rank").innerText = calcRank();
-    document.getElementById("stat-streak").innerText = `ตอบถูกต่อเนื่องสูงสุด: ${maxStreak} ข้อ`;
-    document.getElementById("stat-wrong").innerText = `ตอบผิดไปทั้งสิ้น: ${totalWrong} ครั้ง`;
-    document.getElementById("mission-complete-screen").style.display = "flex"; 
-}
-
-function returnToMainMenu() {
-    document.getElementById("mission-complete-screen").style.display = "none";
-    document.getElementById("game-container").style.display = "none";
-    document.getElementById("role-selection-screen").style.display = "flex";
-    
-    correctCount = 0; currentStreak = 0; maxStreak = 0; totalWrong = 0; timeRemaining = 60;
-    clearInterval(countdownInterval);
-    
-    updateScore(); updateProgressBar();
-    document.getElementById("timer").innerText = "รอกดเริ่มเกม...";
-    document.getElementById("question-text").innerText = "กำลังเตรียมคำถาม...";
-    document.getElementById("interaction-area").innerHTML = "";
-    document.getElementById("feedback").innerText = "";
-    document.getElementById("lifeline-5050").disabled = false;
 }
 
 function selectRole(roleKey) {
@@ -584,28 +430,143 @@ function playSound(type) {
     if (isMuted) return;
     try {
         initAudio(); if (!audioCtx) return;
-        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
         const now = audioCtx.currentTime;
+
+        function playClick(time, freq) {
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, time);
+            gainNode.gain.setValueAtTime(0.04, time);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start(time);
+            osc.stop(time + 0.06);
+        }
+
         if (type === 'spin') {
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, now); osc.frequency.exponentialRampToValueAtTime(300, now + 4.9);
-            gain.gain.setValueAtTime(0.03, now); gain.gain.linearRampToValueAtTime(0, now + 5); osc.start(now); osc.stop(now + 5);
+            let delay = 0;
+            let interval = 0.06;
+            while (delay < 4.8) {
+                let currentFreq = 250 - (delay * 20);
+                playClick(now + delay, currentFreq);
+                delay += interval;
+                interval += 0.008 + (delay * 0.005);
+            }
+
+            const humOsc = audioCtx.createOscillator();
+            const humGain = audioCtx.createGain();
+            const humFilter = audioCtx.createBiquadFilter();
+            
+            humOsc.type = 'sawtooth';
+            humOsc.frequency.setValueAtTime(60, now);
+            humOsc.frequency.linearRampToValueAtTime(40, now + 5);
+            
+            humFilter.type = 'lowpass';
+            humFilter.frequency.setValueAtTime(150, now);
+            
+            humGain.gain.setValueAtTime(0.06, now);
+            humGain.gain.linearRampToValueAtTime(0, now + 5);
+            
+            humOsc.connect(humFilter);
+            humFilter.connect(humGain);
+            humGain.connect(audioCtx.destination);
+            humOsc.start(now);
+            humOsc.stop(now + 5);
+
         } else if (type === 'correct') {
-            osc.type = 'sine'; osc.frequency.setValueAtTime(523.25, now); osc.frequency.setValueAtTime(659.25, now + 0.15); osc.frequency.setValueAtTime(783.99, now + 0.3);
-            gain.gain.setValueAtTime(0.08, now); gain.gain.linearRampToValueAtTime(0, now + 0.6); osc.start(now); osc.stop(now + 0.6);
+            const frequencies = [523.25, 659.25, 783.99, 1046.50];
+            frequencies.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.type = 'sine';
+                const noteTime = now + (index * 0.06);
+                osc.frequency.setValueAtTime(freq, noteTime);
+                
+                gainNode.gain.setValueAtTime(0.0, now);
+                gainNode.gain.setValueAtTime(0.06, noteTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.4);
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                osc.start(noteTime);
+                osc.stop(noteTime + 0.5);
+            });
+
         } else if (type === 'incorrect' || type === 'timeout') {
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(80, now + 0.5);
-            gain.gain.setValueAtTime(0.1, now); gain.gain.linearRampToValueAtTime(0, now + 0.5); osc.start(now); osc.stop(now + 0.5);
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+            
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(120, now);
+            osc.frequency.linearRampToValueAtTime(80, now + 0.4);
+            
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(220, now);
+            
+            gainNode.gain.setValueAtTime(0.15, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+            
+            osc.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.4);
+
+            const subOsc = audioCtx.createOscillator();
+            const subGain = audioCtx.createGain();
+            subOsc.type = 'sine';
+            subOsc.frequency.setValueAtTime(60, now);
+            subGain.gain.setValueAtTime(0.2, now);
+            subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            subOsc.connect(subGain);
+            subGain.connect(audioCtx.destination);
+            subOsc.start(now);
+            subOsc.stop(now + 0.3);
+
         } else if (type === 'panic') {
-            osc.type = 'sine'; osc.frequency.setValueAtTime(800, now); gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0, now + 0.15); osc.start(now); osc.stop(now + 0.15);
+            [0, 0.18].forEach(delay => {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(900, now + delay);
+                
+                gainNode.gain.setValueAtTime(0.06, now + delay);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.12);
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                osc.start(now + delay);
+                osc.stop(now + delay + 0.15);
+            });
+
         } else if (type === 'win') {
-            [440, 554, 659, 880].forEach((f, i) => {
-                const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.connect(g); g.connect(audioCtx.destination);
-                o.frequency.setValueAtTime(f, now + i*0.15); g.gain.setValueAtTime(0.1, now + i*0.15); g.gain.linearRampToValueAtTime(0, now + i*0.15 + 0.5);
-                o.start(now + i*0.15); o.stop(now + i*0.15 + 0.5);
+            const chords = [261.63, 329.63, 392.00, 523.25, 659.25];
+            chords.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                const filter = audioCtx.createBiquadFilter();
+                
+                osc.type = (index % 2 === 0) ? 'triangle' : 'sine';
+                osc.frequency.setValueAtTime(freq, now);
+                
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(1200, now);
+                
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.05, now + 0.15);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
+                
+                osc.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 1.8);
             });
         }
-    } catch(e) {}
+    } catch(e) { console.error("Audio system error:", e); }
 }
 
 function resetPanicMode() {
@@ -643,8 +604,28 @@ function triggerMissionComplete() {
     clearInterval(countdownInterval); resetPanicMode(); playSound('win');
     const totalTimeTaken = (Date.now() - missionStartTime) / 1000;
     
-    // ตรวจสอบและแสดงป๊อปอัปให้พิมพ์ชื่อ หากติดอันดับ
-    checkAndShowLeaderboardPrompt(totalTimeTaken);
+    // แสดงหน้าจอสรุปผลทันทีโดยไม่ต้องผ่านระบบจัดอันดับ
+    document.getElementById("stat-time").innerHTML = `เวลาที่ใช้ปฏิบัติภารกิจ: <span style="color:var(--gold); font-size:1.3rem;">${totalTimeTaken.toFixed(2)}</span> วินาที`;
+    document.getElementById("badge-rank").innerText = calcRank();
+    document.getElementById("stat-streak").innerText = `ตอบถูกต่อเนื่องสูงสุด: ${maxStreak} ข้อ`;
+    document.getElementById("stat-wrong").innerText = `ตอบผิดไปทั้งสิ้น: ${totalWrong} ครั้ง`;
+    document.getElementById("mission-complete-screen").style.display = "flex"; 
+}
+
+function returnToMainMenu() {
+    document.getElementById("mission-complete-screen").style.display = "none";
+    document.getElementById("game-container").style.display = "none";
+    document.getElementById("role-selection-screen").style.display = "flex";
+    
+    correctCount = 0; currentStreak = 0; maxStreak = 0; totalWrong = 0; timeRemaining = 60;
+    clearInterval(countdownInterval);
+    
+    updateScore(); updateProgressBar();
+    document.getElementById("timer").innerText = "รอกดเริ่มเกม...";
+    document.getElementById("question-text").innerText = "กำลังเตรียมคำถาม...";
+    document.getElementById("interaction-area").innerHTML = "";
+    document.getElementById("feedback").innerText = "";
+    document.getElementById("lifeline-5050").disabled = false;
 }
 
 function showCorrectEffect(callback) {
